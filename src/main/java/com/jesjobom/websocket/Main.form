@@ -130,12 +130,18 @@
         <Property name="text" type="java.lang.String" value="Send Hello"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="wsSendHelloBtnActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="wsDisconnectBtn">
       <Properties>
         <Property name="text" type="java.lang.String" value="Disconnect"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="wsDisconnectBtnActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="wsConnectBtn">
       <Properties>

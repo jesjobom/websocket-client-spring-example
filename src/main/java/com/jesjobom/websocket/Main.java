@@ -6,6 +6,8 @@ package com.jesjobom.websocket;
  */
 public class Main extends javax.swing.JFrame {
 
+	private static final long serialVersionUID = -2725530903813434009L;
+
 	private WebsocketClient client;
 	
 	/**
@@ -54,9 +56,19 @@ public class Main extends javax.swing.JFrame {
 
                 wsSendHelloBtn.setText("Send Hello");
                 wsSendHelloBtn.setEnabled(false);
+                wsSendHelloBtn.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                wsSendHelloBtnActionPerformed(evt);
+                        }
+                });
 
                 wsDisconnectBtn.setText("Disconnect");
                 wsDisconnectBtn.setEnabled(false);
+                wsDisconnectBtn.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                wsDisconnectBtnActionPerformed(evt);
+                        }
+                });
 
                 wsConnectBtn.setText("Connect");
                 wsConnectBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -176,12 +188,37 @@ public class Main extends javax.swing.JFrame {
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
+	/**
+	 * CONNECT button action
+	 * 
+	 * @param evt 
+	 */
         private void wsConnectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wsConnectBtnActionPerformed
-                new WebsocketClient(this.wsUrlTxt.getText(), new WebsocketResponseHandler(this.outTxt)).connect((c) -> {
+                new WebsocketClient(this.wsUrlTxt.getText(), this.outTxt, this.chSel).connect(c -> {
 			client = c;
 			setWsConnected(true);
 		});
         }//GEN-LAST:event_wsConnectBtnActionPerformed
+
+	/**
+	 * DISCONNECT button action
+	 * 
+	 * @param evt 
+	 */
+        private void wsDisconnectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wsDisconnectBtnActionPerformed
+                client.disconnect();
+		client = null;
+		setWsConnected(false);
+        }//GEN-LAST:event_wsDisconnectBtnActionPerformed
+
+	/**
+	 * SEND HELLO button action
+	 * 
+	 * @param evt 
+	 */
+        private void wsSendHelloBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wsSendHelloBtnActionPerformed
+                client.sendHello();
+        }//GEN-LAST:event_wsSendHelloBtnActionPerformed
 
 	/**
 	 * @param args the command line arguments
@@ -211,10 +248,8 @@ public class Main extends javax.swing.JFrame {
 		//</editor-fold>
 
 		/* Create and display the form */
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new Main().setVisible(true);
-			}
+		java.awt.EventQueue.invokeLater(() -> {
+			new Main().setVisible(true);
 		});
 	}
 
