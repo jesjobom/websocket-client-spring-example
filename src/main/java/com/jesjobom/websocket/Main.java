@@ -6,6 +6,8 @@ package com.jesjobom.websocket;
  */
 public class Main extends javax.swing.JFrame {
 
+	private WebsocketClient client;
+	
 	/**
 	 * Creates new form Main
 	 */
@@ -57,6 +59,11 @@ public class Main extends javax.swing.JFrame {
                 wsDisconnectBtn.setEnabled(false);
 
                 wsConnectBtn.setText("Connect");
+                wsConnectBtn.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                wsConnectBtnActionPerformed(evt);
+                        }
+                });
 
                 chLbl.setText("CH:");
 
@@ -169,6 +176,13 @@ public class Main extends javax.swing.JFrame {
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
+        private void wsConnectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wsConnectBtnActionPerformed
+                new WebsocketClient(this.wsUrlTxt.getText(), new WebsocketResponseHandler(this.outTxt)).connect((c) -> {
+			client = c;
+			setWsConnected(true);
+		});
+        }//GEN-LAST:event_wsConnectBtnActionPerformed
+
 	/**
 	 * @param args the command line arguments
 	 */
@@ -204,6 +218,31 @@ public class Main extends javax.swing.JFrame {
 		});
 	}
 
+	private void setWsConnected(boolean connected) {
+		this.wsUrlTxt.setEnabled(!connected);
+		this.wsConnectBtn.setEnabled(!connected);
+		this.wsDisconnectBtn.setEnabled(connected);
+		this.wsSendHelloBtn.setEnabled(connected);
+		
+		this.chSel.setEnabled(connected);
+		this.chCreateBtn.setEnabled(connected);
+		
+		this.inTxt.setEnabled(connected);
+		this.inSendBtn.setEnabled(connected);
+
+		this.outTxt.setEnabled(connected);
+		this.outTxt.setEditable(false);
+		
+		if(!connected) {
+			for(int i = 1; i < this.chSel.getItemCount(); i++) {
+				this.chSel.removeItemAt(i);
+			}
+			this.chSel.setSelectedIndex(0);
+			this.chSubscribeBtn.setEnabled(connected);
+			this.chUnsubscribeBtn.setEnabled(connected);
+		}
+	}
+	
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton chCreateBtn;
         private javax.swing.JLabel chLbl;
