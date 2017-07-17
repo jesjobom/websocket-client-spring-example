@@ -1,4 +1,4 @@
-package com.jesjobom.websocket;
+package com.jesjobom.websocket.handler;
 
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;

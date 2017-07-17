@@ -1,8 +1,15 @@
-package com.jesjobom.websocket;
+package com.jesjobom.websocket.stomp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jesjobom.websocket.handler.CustomStompSessionHandler;
+import com.jesjobom.websocket.handler.ChannelsResponseHandler;
+import com.jesjobom.websocket.handler.WebsocketResponseHandler;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -71,6 +78,7 @@ public class WebsocketClient {
 	public void disconnect() {
 		client.stop();
 		session.disconnect();
+		channelsHandler.removeAllChannels();
 	}
 	
 	private void subscribeInitialChannels(StompSession session) {
@@ -81,16 +89,36 @@ public class WebsocketClient {
 		this.session = session;
 	}
 	
-	public StompSession.Subscription subscribe(String destination) {
-		return session.subscribe(destination, responseHandler);
-	}
-	
 	public void sendHello() {
 		send("/client/hello", "Hello!");
 	}
 	
-	public void send(String destination, String message) {
+	public void sendChannel(SubscribableChannel channel, String message) {
+		String ch = channel == null ? "general" : channel.getChannel();
+		send("/client/channel/" + ch, message);
+	}
+	
+	private void send(String destination, String message) {
 		responseHandler.handleSend(message);
-		session.send(destination, message);
+		try {
+			session.send(destination, new ObjectMapper().writeValueAsString(message));
+		} catch (JsonProcessingException ex) {
+			responseHandler.handleError(ex);
+		}
+	}
+
+	public void createChannel() {
+		session.send("/client/channel/create", null);
+	}
+	
+	public void subscribeChannel(SubscribableChannel channel) {
+		StompSession.Subscription sub = session.subscribe(channel.getSubscriptionUri(), responseHandler);
+		channel.setSubscription(sub);
+	}
+
+	public void unsubscribeChannel(SubscribableChannel channel) {
+		StompSession.Subscription subscription = channel.getSubscription();
+		subscription.unsubscribe();
+		channel.setSubscription(null);
 	}
 }

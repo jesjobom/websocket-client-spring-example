@@ -1,4 +1,4 @@
-package com.jesjobom.websocket;
+package com.jesjobom.websocket.handler;
 
 import java.lang.reflect.Type;
 import javax.swing.JTextArea;
@@ -27,7 +27,9 @@ public class WebsocketResponseHandler implements StompFrameHandler {
 
 	@Override
 	public void handleFrame(StompHeaders headers, Object payload) {
-		showMessage("RECV", null, payload.toString());
+		String destination = headers.getDestination();
+		String channel = destination.substring(destination.lastIndexOf("/") + 1);
+		showMessage("RECV", channel, payload.toString());
 	}
 	
 	public void handleError(Throwable ex) {
@@ -42,24 +44,30 @@ public class WebsocketResponseHandler implements StompFrameHandler {
 		builder.append("\n");
 		
 		this.outTextArea.append(builder.toString());
+		this.outTextArea.setCaretPosition(this.outTextArea.getDocument().getLength());
 	}
 	
 	public void handleSend(String msg) {
 		showMessage("SEND", null, msg);
 	}
 	
+	public void handleSend(String msg, String channel) {
+		showMessage("SEND", channel, msg);
+	}
+	
 	public void showMessage(String prefix, String channel, String message) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(prefix).append(" [");
 		if(StringUtils.hasText(channel)) {
-			builder.append(channel);
+			builder.append(channel.toUpperCase());
 		} else {
-			builder.append("GENERAL CH");
+			builder.append("GENERAL");
 		}
 		builder.append("] ");
 		builder.append(message);
 		builder.append("\n");
 		
 		this.outTextArea.append(builder.toString());
+		this.outTextArea.setCaretPosition(this.outTextArea.getDocument().getLength());
 	}
 }

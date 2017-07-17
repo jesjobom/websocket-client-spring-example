@@ -1,5 +1,6 @@
-package com.jesjobom.websocket;
+package com.jesjobom.websocket.handler;
 
+import com.jesjobom.websocket.stomp.SubscribableChannel;
 import javax.swing.JComboBox;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 
@@ -19,7 +20,13 @@ public class ChannelsResponseHandler extends WebsocketResponseHandler {
 
 	@Override
 	public void handleFrame(StompHeaders headers, Object payload) {
-		channels.addItem("Channel " + payload.toString());
+		channels.addItem(new SubscribableChannel(payload.toString()));
 		super.showMessage("RECV", null, "Channel " + payload.toString() + " created");
+	}
+	
+	public void removeAllChannels() {
+		while(channels.getItemCount() > 1) {
+			channels.removeItemAt(1);
+		}
 	}
 }

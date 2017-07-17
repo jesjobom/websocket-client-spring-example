@@ -1,5 +1,9 @@
 package com.jesjobom.websocket;
 
+import com.jesjobom.websocket.stomp.SubscribableChannel;
+import com.jesjobom.websocket.stomp.WebsocketClient;
+import org.springframework.util.StringUtils;
+
 /**
  *
  * @author jairton
@@ -9,7 +13,7 @@ public class Main extends javax.swing.JFrame {
 	private static final long serialVersionUID = -2725530903813434009L;
 
 	private WebsocketClient client;
-	
+
 	/**
 	 * Creates new form Main
 	 */
@@ -81,15 +85,35 @@ public class Main extends javax.swing.JFrame {
 
                 chSel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Choose a channel or create a new one" }));
                 chSel.setEnabled(false);
+                chSel.addItemListener(new java.awt.event.ItemListener() {
+                        public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                                chSelItemStateChanged(evt);
+                        }
+                });
 
                 chUnsubscribeBtn.setText("Unsubscribe");
                 chUnsubscribeBtn.setEnabled(false);
+                chUnsubscribeBtn.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                chUnsubscribeBtnActionPerformed(evt);
+                        }
+                });
 
                 chSubscribeBtn.setText("Subscribe");
                 chSubscribeBtn.setEnabled(false);
+                chSubscribeBtn.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                chSubscribeBtnActionPerformed(evt);
+                        }
+                });
 
                 chCreateBtn.setText("Create");
                 chCreateBtn.setEnabled(false);
+                chCreateBtn.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                chCreateBtnActionPerformed(evt);
+                        }
+                });
 
                 inLbl.setText("IN:");
 
@@ -98,6 +122,11 @@ public class Main extends javax.swing.JFrame {
 
                 inSendBtn.setText("Send");
                 inSendBtn.setEnabled(false);
+                inSendBtn.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                inSendBtnActionPerformed(evt);
+                        }
+                });
 
                 outLbl.setText("OUT:");
 
@@ -190,11 +219,11 @@ public class Main extends javax.swing.JFrame {
 
 	/**
 	 * CONNECT button action
-	 * 
-	 * @param evt 
+	 *
+	 * @param evt
 	 */
         private void wsConnectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wsConnectBtnActionPerformed
-                new WebsocketClient(this.wsUrlTxt.getText(), this.outTxt, this.chSel).connect(c -> {
+		new WebsocketClient(this.wsUrlTxt.getText(), this.outTxt, this.chSel).connect(c -> {
 			client = c;
 			setWsConnected(true);
 		});
@@ -202,23 +231,69 @@ public class Main extends javax.swing.JFrame {
 
 	/**
 	 * DISCONNECT button action
-	 * 
-	 * @param evt 
+	 *
+	 * @param evt
 	 */
         private void wsDisconnectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wsDisconnectBtnActionPerformed
-                client.disconnect();
+		client.disconnect();
 		client = null;
 		setWsConnected(false);
         }//GEN-LAST:event_wsDisconnectBtnActionPerformed
 
 	/**
 	 * SEND HELLO button action
-	 * 
-	 * @param evt 
+	 *
+	 * @param evt
 	 */
         private void wsSendHelloBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wsSendHelloBtnActionPerformed
-                client.sendHello();
+		client.sendHello();
         }//GEN-LAST:event_wsSendHelloBtnActionPerformed
+
+        private void chCreateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chCreateBtnActionPerformed
+		client.createChannel();
+        }//GEN-LAST:event_chCreateBtnActionPerformed
+
+        private void chSelItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_chSelItemStateChanged
+		if (this.chSel.getSelectedIndex() > 0) {
+			SubscribableChannel channel = (SubscribableChannel) this.chSel.getSelectedItem();
+
+			if (channel.getSubscription() == null) {
+				this.chSubscribeBtn.setEnabled(true);
+				this.chUnsubscribeBtn.setEnabled(false);
+
+			} else {
+				this.chSubscribeBtn.setEnabled(false);
+				this.chUnsubscribeBtn.setEnabled(true);
+			}
+		} else {
+			this.chSubscribeBtn.setEnabled(false);
+			this.chUnsubscribeBtn.setEnabled(false);
+		}
+        }//GEN-LAST:event_chSelItemStateChanged
+
+        private void chSubscribeBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chSubscribeBtnActionPerformed
+		SubscribableChannel channel = (SubscribableChannel) this.chSel.getSelectedItem();
+		client.subscribeChannel(channel);
+		chSelItemStateChanged(null);
+        }//GEN-LAST:event_chSubscribeBtnActionPerformed
+
+        private void chUnsubscribeBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chUnsubscribeBtnActionPerformed
+                SubscribableChannel channel = (SubscribableChannel) this.chSel.getSelectedItem();
+		client.unsubscribeChannel(channel);
+		chSelItemStateChanged(null);
+        }//GEN-LAST:event_chUnsubscribeBtnActionPerformed
+
+        private void inSendBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inSendBtnActionPerformed
+		SubscribableChannel channel = null;
+                if (this.chSel.getSelectedIndex() > 0) {
+			channel = (SubscribableChannel) this.chSel.getSelectedItem();
+		}
+		
+		String text = this.inTxt.getText();
+		if(StringUtils.hasText(text)) {
+			client.sendChannel(channel, text);
+		}
+        }//GEN-LAST:event_inSendBtnActionPerformed
 
 	/**
 	 * @param args the command line arguments
@@ -258,18 +333,18 @@ public class Main extends javax.swing.JFrame {
 		this.wsConnectBtn.setEnabled(!connected);
 		this.wsDisconnectBtn.setEnabled(connected);
 		this.wsSendHelloBtn.setEnabled(connected);
-		
+
 		this.chSel.setEnabled(connected);
 		this.chCreateBtn.setEnabled(connected);
-		
+
 		this.inTxt.setEnabled(connected);
 		this.inSendBtn.setEnabled(connected);
 
 		this.outTxt.setEnabled(connected);
 		this.outTxt.setEditable(false);
-		
-		if(!connected) {
-			for(int i = 1; i < this.chSel.getItemCount(); i++) {
+
+		if (!connected) {
+			for (int i = 1; i < this.chSel.getItemCount(); i++) {
 				this.chSel.removeItemAt(i);
 			}
 			this.chSel.setSelectedIndex(0);
@@ -277,7 +352,7 @@ public class Main extends javax.swing.JFrame {
 			this.chUnsubscribeBtn.setEnabled(connected);
 		}
 	}
-	
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton chCreateBtn;
         private javax.swing.JLabel chLbl;
