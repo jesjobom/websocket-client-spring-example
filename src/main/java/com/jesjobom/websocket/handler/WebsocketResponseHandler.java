@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
  * Handles websocket responses and decide how to present them to the user.
  * Also handles other messages.
  *
- * @author jairton
+ * @author jesjobom
  */
 public class WebsocketResponseHandler implements StompFrameHandler {
 

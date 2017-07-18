@@ -6,8 +6,10 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 
 /**
+ * A required {@link StompSessionHandlerAdapter} to connect to the STOMP Websocket.
+ * Without any override all connection errors would be silenced.
  *
- * @author jairton
+ * @author jesjobom
  */
 public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
 	

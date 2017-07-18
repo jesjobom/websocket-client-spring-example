@@ -6,7 +6,7 @@ import org.springframework.util.StringUtils;
 
 /**
  *
- * @author jairton
+ * @author jesjobom
  */
 public class Main extends javax.swing.JFrame {
 
@@ -249,10 +249,20 @@ public class Main extends javax.swing.JFrame {
 		client.sendHello();
         }//GEN-LAST:event_wsSendHelloBtnActionPerformed
 
+	/**
+	 * Channel CREATE button action
+	 * 
+	 * @param evt 
+	 */
         private void chCreateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chCreateBtnActionPerformed
 		client.createChannel();
         }//GEN-LAST:event_chCreateBtnActionPerformed
 
+	/**
+	 * Channel Selection action
+	 * 
+	 * @param evt 
+	 */
         private void chSelItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_chSelItemStateChanged
 		if (this.chSel.getSelectedIndex() > 0) {
 			SubscribableChannel channel = (SubscribableChannel) this.chSel.getSelectedItem();
@@ -271,18 +281,33 @@ public class Main extends javax.swing.JFrame {
 		}
         }//GEN-LAST:event_chSelItemStateChanged
 
+	/**
+	 * Channel SUBSCRIBE button action
+	 * 
+	 * @param evt 
+	 */
         private void chSubscribeBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chSubscribeBtnActionPerformed
 		SubscribableChannel channel = (SubscribableChannel) this.chSel.getSelectedItem();
 		client.subscribeChannel(channel);
 		chSelItemStateChanged(null);
         }//GEN-LAST:event_chSubscribeBtnActionPerformed
 
+	/**
+	 * Channel UNSUBSCRIBE button action
+	 * 
+	 * @param evt 
+	 */
         private void chUnsubscribeBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chUnsubscribeBtnActionPerformed
                 SubscribableChannel channel = (SubscribableChannel) this.chSel.getSelectedItem();
 		client.unsubscribeChannel(channel);
 		chSelItemStateChanged(null);
         }//GEN-LAST:event_chUnsubscribeBtnActionPerformed
 
+	/**
+	 * Text SEND button action
+	 * 
+	 * @param evt 
+	 */
         private void inSendBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inSendBtnActionPerformed
 		SubscribableChannel channel = null;
                 if (this.chSel.getSelectedIndex() > 0) {
@@ -328,6 +353,11 @@ public class Main extends javax.swing.JFrame {
 		});
 	}
 
+	/**
+	 * Controls the visibility of inputs when connected or not 
+	 * 
+	 * @param connected 
+	 */
 	private void setWsConnected(boolean connected) {
 		this.wsUrlTxt.setEnabled(!connected);
 		this.wsConnectBtn.setEnabled(!connected);

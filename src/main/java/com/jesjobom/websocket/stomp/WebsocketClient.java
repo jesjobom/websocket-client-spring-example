@@ -8,8 +8,6 @@ import com.jesjobom.websocket.handler.WebsocketResponseHandler;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -26,8 +24,11 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 /**
+ * Component to connect to the server via Websocket SockJS Stomp.
+ * SockJS will provide a fallback using a different strategy over HTTP if
+ * websocket doesn't work.
  *
- * @author jairton
+ * @author jesjobom
  */
 public class WebsocketClient {
 
@@ -41,6 +42,15 @@ public class WebsocketClient {
 	
 	private StompSession session;
 
+	/**
+	 * Constructor to configure the URL with the endpoint expected.
+	 * Also, some interface components are informed to allow some interactions
+	 * (websocket response) -> (user)
+	 * 
+	 * @param url
+	 * @param output
+	 * @param channels 
+	 */
 	public WebsocketClient(String url, JTextArea output, JComboBox channels) {
 		this.url = url + (url.endsWith("/") ? "" : "/") + "chat";
 		this.responseHandler = new WebsocketResponseHandler(output);
@@ -51,8 +61,8 @@ public class WebsocketClient {
 		ListenableFuture<StompSession> connectionStatus = connect();
 
 		connectionStatus.addCallback(
-			s -> {
-				subscribeInitialChannels(s);
+			localSession -> {
+				subscribeInitialChannels(localSession);
 				successCallback.onSuccess(this);
 			},
 			ex -> {
